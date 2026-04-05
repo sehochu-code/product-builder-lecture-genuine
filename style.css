@@ -44,11 +44,33 @@ h1 {
     transition: background-color 0.3s, box-shadow 0.3s;
 }
 
+.games-container {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    margin-bottom: 20px;
+}
+
+.game-row {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.game-label {
+    width: 60px;
+    font-size: 13px;
+    font-weight: bold;
+    color: var(--text-color);
+    text-align: right;
+    flex-shrink: 0;
+    transition: color 0.3s;
+}
+
 .number-container {
     display: flex;
     justify-content: center;
-    gap: 10px;
-    margin-bottom: 20px;
+    gap: 8px;
 }
 
 .number {

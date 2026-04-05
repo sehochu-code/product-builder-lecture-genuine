@@ -1,5 +1,5 @@
 const drawButton = document.getElementById('draw-button');
-const numbersContainer = document.getElementById('numbers');
+const gamesContainer = document.getElementById('games');
 const themeToggle = document.getElementById('theme-toggle-input');
 
 // 저장된 테마 적용
@@ -19,23 +19,39 @@ themeToggle.addEventListener('change', () => {
 });
 
 drawButton.addEventListener('click', () => {
-    drawNumbers();
+    drawAllGames();
 });
 
-function drawNumbers() {
-    numbersContainer.innerHTML = '';
+function generateNumbers() {
     const numbers = new Set();
     while (numbers.size < 6) {
-        const randomNumber = Math.floor(Math.random() * 45) + 1;
-        numbers.add(randomNumber);
+        numbers.add(Math.floor(Math.random() * 45) + 1);
     }
+    return Array.from(numbers).sort((a, b) => a - b);
+}
 
-    const sortedNumbers = Array.from(numbers).sort((a, b) => a - b);
+function drawAllGames() {
+    gamesContainer.innerHTML = '';
+    for (let i = 0; i < 5; i++) {
+        const gameRow = document.createElement('div');
+        gameRow.classList.add('game-row');
 
-    sortedNumbers.forEach(number => {
-        const numberElement = document.createElement('div');
-        numberElement.classList.add('number');
-        numberElement.textContent = number;
-        numbersContainer.appendChild(numberElement);
-    });
+        const label = document.createElement('span');
+        label.classList.add('game-label');
+        label.textContent = `Game ${i + 1}`;
+        gameRow.appendChild(label);
+
+        const numberContainer = document.createElement('div');
+        numberContainer.classList.add('number-container');
+
+        generateNumbers().forEach(number => {
+            const el = document.createElement('div');
+            el.classList.add('number');
+            el.textContent = number;
+            numberContainer.appendChild(el);
+        });
+
+        gameRow.appendChild(numberContainer);
+        gamesContainer.appendChild(gameRow);
+    }
 }
