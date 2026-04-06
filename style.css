@@ -89,7 +89,7 @@ h1 {
 .game-row .number { background-color: #3498db; }
 
 #draw-button {
-    background-color: #008CBA;
+    background-color: #2ecc71;
     color: white;
     border: none;
     padding: 10px 20px;
@@ -100,7 +100,7 @@ h1 {
 }
 
 #draw-button:hover {
-    background-color: #005f7a;
+    background-color: #27ae60;
 }
 
 .theme-toggle {
