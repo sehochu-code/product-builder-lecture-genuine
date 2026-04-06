@@ -160,3 +160,86 @@ h1 {
 .toggle-switch input:checked + .toggle-slider::before {
     transform: translateX(22px);
 }
+
+.contact-section {
+    margin-top: 40px;
+    background-color: var(--container-bg);
+    border-radius: 10px;
+    padding: 28px 32px;
+    box-shadow: var(--shadow);
+    transition: background-color 0.3s, box-shadow 0.3s;
+    text-align: left;
+    max-width: 480px;
+}
+
+.contact-section h2 {
+    color: var(--text-color);
+    margin: 0 0 20px;
+    font-size: 20px;
+    transition: color 0.3s;
+}
+
+.form-group {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    margin-bottom: 16px;
+}
+
+.form-group label {
+    font-size: 14px;
+    font-weight: bold;
+    color: var(--text-color);
+    transition: color 0.3s;
+}
+
+.form-group input,
+.form-group textarea {
+    padding: 10px 12px;
+    border: 1px solid #ccc;
+    border-radius: 6px;
+    font-size: 14px;
+    background-color: var(--bg-color);
+    color: var(--text-color);
+    transition: background-color 0.3s, color 0.3s, border-color 0.3s;
+    outline: none;
+    resize: vertical;
+}
+
+.form-group input:focus,
+.form-group textarea:focus {
+    border-color: #008CBA;
+}
+
+.submit-button {
+    width: 100%;
+    background-color: #008CBA;
+    color: white;
+    border: none;
+    padding: 12px;
+    font-size: 15px;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: background-color 0.3s;
+    margin-top: 4px;
+}
+
+.submit-button:hover {
+    background-color: #005f7a;
+}
+
+.form-status {
+    margin-top: 12px;
+    font-size: 14px;
+    text-align: center;
+    min-height: 20px;
+    color: var(--text-color);
+}
+
+.form-status.success {
+    color: #2ecc71;
+}
+
+.form-status.error {
+    color: #e74c3c;
+}
