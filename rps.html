@@ -1,0 +1,316 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>가위바위보 인식기</title>
+    <style>
+        :root {
+            --bg-color: #f0f0f0;
+            --container-bg: #fff;
+            --text-color: #333;
+            --shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            --toggle-bg: #ccc;
+            --sub-text: #666;
+            --bar-bg: #e0e0e0;
+        }
+
+        body.dark {
+            --bg-color: #1a1a2e;
+            --container-bg: #16213e;
+            --text-color: #e0e0e0;
+            --shadow: 0 4px 8px rgba(0, 0, 0, 0.5);
+            --toggle-bg: #3498db;
+            --sub-text: #aaa;
+            --bar-bg: #2a3a5e;
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+
+        body {
+            font-family: sans-serif;
+            background-color: var(--bg-color);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 40px 16px;
+            transition: background-color 0.3s;
+        }
+
+        h1 {
+            color: var(--text-color);
+            margin-bottom: 24px;
+            font-size: 28px;
+            transition: color 0.3s;
+        }
+
+        .card {
+            background-color: var(--container-bg);
+            border-radius: 12px;
+            padding: 28px;
+            box-shadow: var(--shadow);
+            transition: background-color 0.3s, box-shadow 0.3s;
+            width: 100%;
+            max-width: 420px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 24px;
+        }
+
+        #webcam-container canvas {
+            border-radius: 10px;
+            width: 320px !important;
+            height: 320px !important;
+            object-fit: cover;
+        }
+
+        .result-box {
+            width: 100%;
+            text-align: center;
+        }
+
+        .result-label {
+            font-size: 48px;
+            margin-bottom: 8px;
+        }
+
+        .result-name {
+            font-size: 22px;
+            font-weight: bold;
+            color: var(--text-color);
+            transition: color 0.3s;
+        }
+
+        .bars {
+            width: 100%;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .bar-row {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .bar-label {
+            width: 60px;
+            font-size: 13px;
+            color: var(--sub-text);
+            text-align: right;
+            flex-shrink: 0;
+            transition: color 0.3s;
+        }
+
+        .bar-track {
+            flex: 1;
+            height: 14px;
+            background-color: var(--bar-bg);
+            border-radius: 7px;
+            overflow: hidden;
+            transition: background-color 0.3s;
+        }
+
+        .bar-fill {
+            height: 100%;
+            border-radius: 7px;
+            width: 0%;
+            transition: width 0.2s ease;
+        }
+
+        .bar-fill.scissors { background-color: #e74c3c; }
+        .bar-fill.rock     { background-color: #3498db; }
+        .bar-fill.paper    { background-color: #2ecc71; }
+
+        .bar-pct {
+            width: 38px;
+            font-size: 12px;
+            color: var(--sub-text);
+            text-align: right;
+            flex-shrink: 0;
+            transition: color 0.3s;
+        }
+
+        .start-btn {
+            background-color: #2ecc71;
+            color: white;
+            border: none;
+            padding: 12px 32px;
+            font-size: 16px;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+
+        .start-btn:hover { background-color: #27ae60; }
+        .start-btn:disabled { background-color: #95a5a6; cursor: default; }
+
+        .theme-toggle {
+            position: fixed;
+            top: 16px;
+            right: 16px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            cursor: pointer;
+            user-select: none;
+        }
+
+        .theme-toggle span {
+            font-size: 14px;
+            color: var(--text-color);
+            transition: color 0.3s;
+        }
+
+        .toggle-switch {
+            position: relative;
+            width: 48px;
+            height: 26px;
+        }
+
+        .toggle-switch input { opacity: 0; width: 0; height: 0; }
+
+        .toggle-slider {
+            position: absolute;
+            inset: 0;
+            background-color: var(--toggle-bg);
+            border-radius: 26px;
+            transition: background-color 0.3s;
+            cursor: pointer;
+        }
+
+        .toggle-slider::before {
+            content: '';
+            position: absolute;
+            width: 20px;
+            height: 20px;
+            left: 3px;
+            top: 3px;
+            background-color: #fff;
+            border-radius: 50%;
+            transition: transform 0.3s;
+        }
+
+        .toggle-switch input:checked + .toggle-slider::before {
+            transform: translateX(22px);
+        }
+    </style>
+</head>
+<body>
+    <label class="theme-toggle" aria-label="Toggle dark mode">
+        <span>☀️</span>
+        <div class="toggle-switch">
+            <input type="checkbox" id="theme-toggle-input">
+            <div class="toggle-slider"></div>
+        </div>
+        <span>🌙</span>
+    </label>
+
+    <h1>가위바위보 인식기</h1>
+
+    <div class="card">
+        <div id="webcam-container"></div>
+
+        <div class="result-box">
+            <div class="result-label" id="result-emoji">✋</div>
+            <div class="result-name" id="result-name">카메라를 시작하세요</div>
+        </div>
+
+        <div class="bars">
+            <div class="bar-row">
+                <span class="bar-label">✌️ 가위</span>
+                <div class="bar-track"><div class="bar-fill scissors" id="bar-scissors"></div></div>
+                <span class="bar-pct" id="pct-scissors">0%</span>
+            </div>
+            <div class="bar-row">
+                <span class="bar-label">✊ 바위</span>
+                <div class="bar-track"><div class="bar-fill rock" id="bar-rock"></div></div>
+                <span class="bar-pct" id="pct-rock">0%</span>
+            </div>
+            <div class="bar-row">
+                <span class="bar-label">🖐 보</span>
+                <div class="bar-track"><div class="bar-fill paper" id="bar-paper"></div></div>
+                <span class="bar-pct" id="pct-paper">0%</span>
+            </div>
+        </div>
+
+        <button class="start-btn" id="start-btn" onclick="init()">카메라 시작</button>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@latest/dist/tf.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@teachablemachine/image@latest/dist/teachablemachine-image.min.js"></script>
+    <script>
+        const MODEL_URL = "https://teachablemachine.withgoogle.com/models/5Ah1BkdFV/";
+
+        const CLASS_MAP = {
+            "scissors": { emoji: "✌️", name: "가위", barId: "bar-scissors", pctId: "pct-scissors" },
+            "rock":     { emoji: "✊", name: "바위", barId: "bar-rock",     pctId: "pct-rock" },
+            "paper":    { emoji: "🖐", name: "보",   barId: "bar-paper",    pctId: "pct-paper" },
+        };
+
+        let model, webcam;
+
+        async function init() {
+            const btn = document.getElementById("start-btn");
+            btn.disabled = true;
+            btn.textContent = "로딩 중...";
+
+            model = await tmImage.load(MODEL_URL + "model.json", MODEL_URL + "metadata.json");
+
+            webcam = new tmImage.Webcam(320, 320, true);
+            await webcam.setup();
+            await webcam.play();
+
+            document.getElementById("webcam-container").appendChild(webcam.canvas);
+            btn.style.display = "none";
+
+            loop();
+        }
+
+        async function loop() {
+            webcam.update();
+            const predictions = await model.predict(webcam.canvas);
+
+            let topClass = predictions[0];
+            predictions.forEach(p => { if (p.probability > topClass.probability) topClass = p; });
+
+            const key = topClass.className.toLowerCase();
+            const info = CLASS_MAP[key] || { emoji: "❓", name: topClass.className };
+
+            document.getElementById("result-emoji").textContent = info.emoji;
+            document.getElementById("result-name").textContent = info.name;
+
+            predictions.forEach(p => {
+                const k = p.className.toLowerCase();
+                const m = CLASS_MAP[k];
+                if (!m) return;
+                const pct = Math.round(p.probability * 100);
+                document.getElementById(m.barId).style.width = pct + "%";
+                document.getElementById(m.pctId).textContent = pct + "%";
+            });
+
+            requestAnimationFrame(loop);
+        }
+
+        // 다크모드
+        const themeToggle = document.getElementById("theme-toggle-input");
+        if (localStorage.getItem("theme") === "dark") {
+            document.body.classList.add("dark");
+            themeToggle.checked = true;
+        }
+        themeToggle.addEventListener("change", () => {
+            if (themeToggle.checked) {
+                document.body.classList.add("dark");
+                localStorage.setItem("theme", "dark");
+            } else {
+                document.body.classList.remove("dark");
+                localStorage.setItem("theme", "light");
+            }
+        });
+    </script>
+</body>
+</html>
