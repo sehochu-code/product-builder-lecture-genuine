@@ -86,11 +86,7 @@ h1 {
     font-weight: bold;
 }
 
-.game-row:nth-child(1) .number { background-color: #e74c3c; }
-.game-row:nth-child(2) .number { background-color: #e67e22; }
-.game-row:nth-child(3) .number { background-color: #2ecc71; }
-.game-row:nth-child(4) .number { background-color: #3498db; }
-.game-row:nth-child(5) .number { background-color: #9b59b6; }
+.game-row .number { background-color: #3498db; }
 
 #draw-button {
     background-color: #008CBA;
